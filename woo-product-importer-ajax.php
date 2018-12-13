@@ -451,10 +451,9 @@ if (isset($post_data['uploaded_file_path'])) {
         }
 
         if (!$new_post['sku_parent'] && in_array($post_data['type_product'], ['product_variation'])) {
-            
-            $row_count=$insert_count=0;
+
+            $row_count = $insert_count = 0;
             $error_messages[] = __('variation requires parent.', 'woo-product-importer');
-            
         } else {
 
             //set some more post_meta and parse things as appropriate
@@ -533,13 +532,13 @@ if (isset($post_data['uploaded_file_path'])) {
 
                             foreach ($post_data['custom_field_name'] as $field) {
                                 if ($new_post_custom_fields[$field]) {
-                                    $variation_data['attributes'][$field]=$new_post_custom_fields[$field]['value'];
+                                    $variation_data['attributes'][$field] = $new_post_custom_fields[$field]['value'];
                                 }
                             }
 
                             $new_post_id = create_product_variation($product_id, $variation_data, $new_post, $new_post_meta);
                             $new_post_insert_success = true;
-                        }else{
+                        } else {
                             $error_messages[] = __('variation requires exiting parent.', 'woo-product-importer');
                         }
                     }
@@ -587,6 +586,7 @@ if (isset($post_data['uploaded_file_path'])) {
                                 $new_post_custom_fields = array_merge($existing_product_attributes, $new_post_custom_fields);
                             }
                         }
+
                         add_post_meta($new_post_id, '_product_attributes', $new_post_custom_fields, true) or
                                 update_post_meta($new_post_id, '_product_attributes', $new_post_custom_fields);
 
@@ -763,7 +763,6 @@ if (isset($post_data['uploaded_file_path'])) {
     }
 }
 
-
 function create_product_variation($product_id, $variation_data, $new_post, $post_meta) {
 
 //    if (!isset($menuOrder[$product_id]))
@@ -777,27 +776,20 @@ function create_product_variation($product_id, $variation_data, $new_post, $post
     $new_post['post_parent'] = $product_id;
     $new_post['guid'] = $product->get_permalink();
 
-//    $variation_post = array(
-//        'post_title' => $product->get_title(),
-//        'post_name' => 'product-' . $product_id . '-variation',
-//        'post_description' => $variation_data['name'],
-//        'post_status' => 'publish',
-//        'post_parent' => $product_id,
-//        'post_type' => 'product_variation',
-//        'guid' => $product->get_permalink()
-//    );
+
     // Creating the product variation
     $variation_id = wp_insert_post($new_post);
 
     // Get an instance of the WC_Product_Variation object
-    $variation = new WC_Product_Variation($variation_id);
+    //$variation = new WC_Product_Variation($variation_id);
 
     // Iterating through the variations attributes
     foreach ($variation_data['attributes'] as $attribute => $term_name) {
         $taxonomy = 'pa_' . $attribute; // The attribute taxonomy
         // If taxonomy doesn't exists we create it (Thanks to Carl F. Corneil)
         if (!taxonomy_exists($taxonomy)) {
-            register_taxonomy($taxonomy, 'product_variation', ['hierarchical' => false,
+            register_taxonomy($taxonomy, 'product_variation', [
+                'hierarchical' => false,
                 'label' => ucfirst($taxonomy),
                 'query_var' => true,
             ]);
@@ -816,22 +808,30 @@ function create_product_variation($product_id, $variation_data, $new_post, $post
             wp_set_post_terms($product_id, $term_name, $taxonomy, true);
 
         // Set/save the attribute data in the product variation
-        update_post_meta($variation_id, 'attribute_' . $taxonomy, $term_slug);
+        update_post_meta($variation_id, 'attribute_' . $attribute, $term_slug);
     }
 
+
+    //set post_meta on inserted post
+    foreach ($post_meta as $meta_key => $meta_value) {
+        add_post_meta($variation_id, $meta_key, $meta_value, true);
+    }
+
+    
+    /*
     ## Set/save all other data
     // SKU
-    if (!empty($variation_data['sku']))
-        $variation->set_sku($variation_data['sku']);
+    if (!empty($post_meta['_sku']))
+        $variation->set_sku($post_meta['_sku']);
 
     // Prices
-    if (empty($variation_data['sale_price'])) {
-        $variation->set_price($variation_data['regular_price']);
+    if (empty($post_meta['_sale_price'])) {
+        $variation->set_price($post_meta['_regular_price']);
     } else {
-        $variation->set_price($variation_data['sale_price']);
-        $variation->set_sale_price($variation_data['sale_price']);
+        $variation->set_price($post_meta['_sale_price']);
+        $variation->set_sale_price($post_meta['_sale_price']);
     }
-    $variation->set_regular_price($variation_data['regular_price']);
+    $variation->set_regular_price($post_meta['_regular_price']);
 
     // Stock
     if (!empty($variation_data['stock_qty'])) {
@@ -845,6 +845,8 @@ function create_product_variation($product_id, $variation_data, $new_post, $post
     $variation->set_weight($variation_data['weight']); // weight (reseting)
 
     $variation->save(); // Save the data
+     *
+     */
 
     return $variation_id;
 }
