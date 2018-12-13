@@ -110,6 +110,9 @@
         '_sku' => array(
             'label' => __( 'SKU', 'woo-product-importer' ),
             'mapping_hints' => array()),
+        'sku_parent' => array(
+            'label' => __( 'SKU Parent', 'woo-product-importer' ),
+            'mapping_hints' => array()),
         'post_content' => array(
             'label' => __( 'Description', 'woo-product-importer' ),
             'mapping_hints' => array('desc', 'content')),
@@ -323,6 +326,11 @@
 
             <p>
                 <button class="button-primary" type="submit"><?php _e( 'Import', 'woo-product-importer' ); ?></button>
+                <select name="type_product">
+                    <option value="product">Product</option>
+                    <option value="variable_product">Variable Product</option>
+                    <option value="product_variation">Product Variation</option>
+                </select>
             </p>
 
             <table id="import_data_preview" class="wp-list-table widefat fixed pages" cellspacing="0">

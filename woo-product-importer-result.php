@@ -29,7 +29,9 @@
         'post_meta_key' => $_POST['post_meta_key'],
         'user_locale' => $_POST['user_locale'],
         'import_csv_separator' => $_POST['import_csv_separator'],
-        'import_csv_hierarchy_separator' => $_POST['import_csv_hierarchy_separator']
+        'import_csv_hierarchy_separator' => $_POST['import_csv_hierarchy_separator'],
+        'type_product' => $_POST['type_product'],
+        
     );
 ?>
 <script type="text/javascript">
@@ -57,7 +59,8 @@
                 "post_meta_key": '<?php echo (serialize($post_data['post_meta_key'])); ?>',
                 "user_locale": '<?php echo (serialize($post_data['user_locale'])); ?>',
                 "import_csv_separator": '<?php echo (serialize($post_data['import_csv_separator'])); ?>',
-                "import_csv_hierarchy_separator": '<?php echo (serialize($post_data['import_csv_hierarchy_separator'])); ?>'
+                "import_csv_hierarchy_separator": '<?php echo (serialize($post_data['import_csv_hierarchy_separator'])); ?>',
+                "type_product":'<?php echo $post_data['type_product']; ?>'
             };
 
             //ajaxurl is defined by WordPress

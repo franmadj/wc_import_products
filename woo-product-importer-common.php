@@ -177,4 +177,8 @@
         margin: 0;
         padding: 0;
     }
+    #import_data_preview tr td{
+        max-width:300px;
+        
+    }
 </style>
